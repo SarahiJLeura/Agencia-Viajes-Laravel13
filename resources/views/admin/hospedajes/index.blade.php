@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="flex">
-    @include('admin.layouts.sidebar')
     
     <div class="flex-1 p-6 lg:p-8">
         <div class="flex justify-between items-center mb-6">
@@ -12,7 +11,7 @@
                 <h1 class="font-headline-lg text-on-background">Gestión de Hospedajes</h1>
                 <p class="text-slate-500">Administra hoteles, resorts y alojamientos</p>
             </div>
-            <a href="{{ route('admin.hospedajes.create') }}" class="bg-primary text-white px-5 py-2 rounded-lg flex items-center gap-2">
+            <a href="{{ route('admin.hospedajes.create') }}" class="bg-blue-700 text-white px-5 py-2 rounded-lg flex items-center gap-2">
                 <span class="material-symbols-outlined">add</span>
                 Nuevo Hospedaje
             </a>

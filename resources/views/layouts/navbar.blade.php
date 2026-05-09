@@ -1,24 +1,10 @@
 <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-[#EBECF0] ocean-shadow">
     <nav class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
         <div class="flex items-center gap-4">
-            <button class="md:hidden active:scale-95 transition-transform duration-200" id="mobile-menu-btn">
+            <button class="lg:hidden active:scale-95 transition-transform duration-200" id="mobile-menu-btn">
                 <span class="material-symbols-outlined text-[#0052CC]">menu</span>
             </button>
             <a href="/" class="text-2xl font-black text-[#0052CC] font-['Plus_Jakarta_Sans'] tracking-tight">GlobalQuest</a>
-        </div>
-        
-        <div class="hidden md:flex items-center gap-8">
-            @auth
-                <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors {{ request()->routeIs('destinos*') ? 'text-[#0052CC] border-b-2 border-[#0052CC]' : '' }}" href="{{ route('destinos.publicos') }}">Destinos</a>
-                <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors {{ request()->routeIs('viajes*') ? 'text-[#0052CC] border-b-2 border-[#0052CC]' : '' }}" href="{{ route('viajes.index') }}">Mis Viajes</a>
-                @if(auth()->user()->isAdmin())
-                    <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="{{ route('admin.dashboard') }}">Admin Panel</a>
-                @endif
-            @else
-                <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="{{ route('destinos.publicos') }}">Destinos</a>
-                <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="#">Paquetes</a>
-                <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="#">Nosotros</a>
-            @endauth
         </div>
         
         <div class="flex items-center gap-4">
@@ -32,15 +18,6 @@
                         <span class="material-symbols-outlined text-sm hidden md:inline">expand_more</span>
                     </button>
                     <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl ocean-shadow-lg border border-[#EBECF0] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low rounded-t-xl transition-colors">
-                            <span class="material-symbols-outlined text-primary">dashboard</span>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ route('viajes.index') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low transition-colors">
-                            <span class="material-symbols-outlined text-primary">luggage</span>
-                            <span>Mis Viajes</span>
-                        </a>
-                        <hr class="my-1 border-[#EBECF0]">
                         <form method="POST" action="{{ route('logout') }}" class="block">
                             @csrf
                             <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-error-container hover:text-error rounded-b-xl transition-colors">
@@ -57,42 +34,160 @@
         </div>
     </nav>
     
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-50 hidden md:hidden" style="display: none;">
-        <div class="bg-white w-80 h-full p-6">
+    <!-- Mobile / Tablet Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-50 hidden lg:hidden">
+        <div id="mobile-drawer" class="bg-white w-72 h-full p-6 transform -translate-x-full transition-transform duration-300">
+            <!-- Header -->
             <div class="flex justify-between items-center mb-8">
-                <span class="text-2xl font-black text-[#0052CC]">GlobalQuest</span>
-                <button id="close-menu" class="p-2">
+                <span class="text-2xl font-black text-[#0052CC]">
+                    GlobalQuest
+                </span>
+
+                <button id="close-menu" class="p-2 rounded-lg hover:bg-slate-100">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="space-y-4">
+
+            <!-- Usuario -->
+            @auth
+                <div class="flex items-center gap-3 mb-8 pb-6 border-b">
+                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+
+                    <div>
+                        <p class="font-semibold">{{ auth()->user()->name }}</p>
+                        <p class="text-sm text-slate-500">
+                            {{ auth()->user()->isAdmin() ? 'Administrador' : 'Usuario' }}
+                        </p>
+                    </div>
+                </div>
+            @endauth
+
+            <!-- Navegación -->
+            <nav class="space-y-2">
+
+                {{-- ADMIN --}}
                 @auth
-                    <a href="{{ route('destinos.publicos') }}" class="block py-2 font-semibold">Destinos</a>
-                    <a href="{{ route('viajes.index') }}" class="block py-2 font-semibold">Mis Viajes</a>
-                    <a href="{{ route('dashboard') }}" class="block py-2 font-semibold">Dashboard</a>
                     @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="block py-2 font-semibold">Admin Panel</a>
+
+                        <a href="{{ route('admin.dashboard') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span>Dashboard</span>
+                        </a>
+
+                        <a href="{{ route('admin.usuarios.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Usuarios</span>
+                        </a>
+
+                        <a href="{{ route('admin.destinos.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">map</span>
+                            <span>Destinos</span>
+                        </a>
+
+                        <a href="{{ route('admin.hospedajes.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">hotel</span>
+                            <span>Hospedajes</span>
+                        </a>
+
+                        <a href="{{ route('admin.transportes.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">directions_car</span>
+                            <span>Transportes</span>
+                        </a>
+
+                        <a href="{{ route('admin.viajes.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">luggage</span>
+                            <span>Viajes</span>
+                        </a>
+
+                    @else
+
+                        {{-- USER --}}
+                        <a href="{{ route('destinos.publicos') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">explore</span>
+                            <span>Destinos</span>
+                        </a>
+
+                        <a href="{{ route('viajes.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">luggage</span>
+                            <span>Mis Viajes</span>
+                        </a>
+
+                        <a href="{{ route('dashboard') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span>Dashboard</span>
+                        </a>
+
                     @endif
-                    <hr class="my-4">
-                    <form method="POST" action="{{ route('logout') }}">
+
+                    <!-- Logout -->
+                    <form method="POST" action="{{ route('logout') }}" class="pt-6">
                         @csrf
-                        <button type="submit" class="block w-full text-left py-2 font-semibold text-error">Cerrar Sesión</button>
+
+                        <button type="submit"
+                                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 text-red-500">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Cerrar Sesión</span>
+                        </button>
                     </form>
+
                 @else
-                    <a href="{{ route('login') }}" class="block py-2 font-semibold">Iniciar Sesión</a>
-                    <a href="{{ route('register') }}" class="block py-2 font-semibold text-primary">Registrarse</a>
+
+                    {{-- GUEST --}}
+                    <a href="{{ route('login') }}"
+                    class="block px-4 py-3 rounded-lg hover:bg-blue-50">
+                        Iniciar Sesión
+                    </a>
+
+                    <a href="{{ route('register') }}"
+                    class="block px-4 py-3 rounded-lg bg-primary text-white">
+                        Registrarse
+                    </a>
+
                 @endauth
-            </div>
+
+            </nav>
         </div>
     </div>
     
     <script>
-        document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
-            document.getElementById('mobile-menu').style.display = 'block';
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const closeMenu = document.getElementById('close-menu');
+
+        mobileMenuBtn?.addEventListener('click', () => {
+            mobileMenu.classList.remove('hidden');
+
+            setTimeout(() => {
+                mobileDrawer.classList.remove('-translate-x-full');
+            }, 10);
         });
-        document.getElementById('close-menu')?.addEventListener('click', () => {
-            document.getElementById('mobile-menu').style.display = 'none';
+
+        const closeDrawer = () => {
+            mobileDrawer.classList.add('-translate-x-full');
+
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+            }, 300);
+        };
+
+        closeMenu?.addEventListener('click', closeDrawer);
+
+        mobileMenu?.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                closeDrawer();
+            }
         });
     </script>
 </header>

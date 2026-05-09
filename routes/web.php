@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
         
         // Usuarios
-        Route::resource('/usuarios', UsuarioController::class);
+        Route::resource('/usuarios', UsuarioController::class)->except(['show']);
         Route::post('/usuarios/importar', [UsuarioController::class, 'importarCSV'])->name('usuarios.importar');
         Route::get('/usuarios/exportar', [UsuarioController::class, 'exportarCSV'])->name('usuarios.exportar');
         
@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('/hospedajes', HospedajeController::class);
         
         // Viajes (Admin)
-        Route::get('/viajes', [ViajeController::class, 'indexAdmin'])->name('admin.viajes.index');
+        Route::get('/viajes', [ViajeController::class, 'indexAdmin'])->name('viajes.index');
     });
 });
 

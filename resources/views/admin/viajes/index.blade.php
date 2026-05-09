@@ -3,9 +3,6 @@
 @section('title', 'Gestión de Viajes - Admin')
 
 @section('content')
-<div class="flex">
-    @include('admin.layouts.sidebar')
-    
     <div class="flex-1 p-6 lg:p-8">
         <div class="flex justify-between items-center mb-6">
             <div>
@@ -106,5 +103,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection

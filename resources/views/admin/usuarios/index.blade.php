@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="flex">
-    @include('admin.layouts.sidebar')
     
     <div class="flex-1 p-6 lg:p-8">
         <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
@@ -16,16 +15,16 @@
                 <form method="POST" action="{{ route('admin.usuarios.importar') }}" enctype="multipart/form-data" class="inline">
                     @csrf
                     <label class="cursor-pointer bg-white border-2 border-primary text-primary px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-50 transition-colors">
-                        <span class="material-symbols-outlined">upload</span>
+                        <span class="material-symbols-outlined">download</span>
                         Importar CSV
                         <input type="file" name="csv_file" accept=".csv" class="hidden" onchange="this.form.submit()">
                     </label>
                 </form>
                 <a href="{{ route('admin.usuarios.exportar') }}" class="bg-white border-2 border-primary text-primary px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-50 transition-colors">
-                    <span class="material-symbols-outlined">download</span>
+                    <span class="material-symbols-outlined">upload</span>
                     Exportar CSV
                 </a>
-                <a href="{{ route('admin.usuarios.create') }}" class="bg-primary text-white px-5 py-2 rounded-lg flex items-center gap-2">
+                <a href="{{ route('admin.usuarios.create') }}" class="bg-blue-700 text-white px-5 py-2 rounded-lg flex items-center gap-2">
                     <span class="material-symbols-outlined">add</span>
                     Nuevo Usuario
                 </a>
@@ -58,7 +57,7 @@
                             <td class="px-6 py-4 text-sm">#{{ $usuario->id }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                    <div class="w-8 h-8 rounded-full bg-blue-700/10 flex items-center justify-center text-primary font-bold text-sm">
                                         {{ strtoupper(substr($usuario->name, 0, 1)) }}
                                     </div>
                                     <span class="font-semibold">{{ $usuario->name }}</span>

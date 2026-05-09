@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="flex">
-    @include('admin.layouts.sidebar')
     
     <div class="flex-1 p-6 lg:p-8 max-w-2xl">
         <h1 class="font-headline-lg text-on-background mb-6">Editar Hospedaje</h1>
@@ -64,7 +63,7 @@
             </div>
             
             <div class="flex gap-3 mt-8 pt-4 border-t border-[#EBECF0]">
-                <button type="submit" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold">Actualizar Hospedaje</button>
+                <button type="submit" class="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">Actualizar Hospedaje</button>
                 <a href="{{ route('admin.hospedajes.index') }}" class="px-6 py-3 border border-slate-300 rounded-lg font-semibold hover:bg-slate-50">Cancelar</a>
             </div>
         </form>

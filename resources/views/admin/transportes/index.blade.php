@@ -5,7 +5,6 @@
 
 @section('content')
 <div class="flex">
-    @include('admin.layouts.sidebar')
     
     <div class="flex-1 p-6 lg:p-8">
         <div class="flex justify-between items-center mb-6">
@@ -13,7 +12,7 @@
                 <h1 class="font-headline-lg text-on-background">Gestión de Transportes</h1>
                 <p class="text-slate-500">Administra los vehículos de la flota</p>
             </div>
-            <a href="{{ route('admin.transportes.create') }}" class="bg-primary text-white px-5 py-2 rounded-lg flex items-center gap-2">
+            <a href="{{ route('admin.transportes.create') }}" class="bg-blue-700 text-white px-5 py-2 rounded-lg flex items-center gap-2">
                 <span class="material-symbols-outlined">add</span>
                 Nuevo Transporte
             </a>

@@ -26,11 +26,18 @@
     @stack('styles')
 </head>
 <body class="bg-background text-on-background font-body-md">
-    @include('layouts.navbar')
-    
-    
-    <main>
-        @yield('content')
+    @include('components.navbar')
+
+    <main class="flex">
+
+        {{-- SIDEBAR --}}
+        <x-sidebar />
+
+        {{-- CONTENIDO --}}
+        <div class="flex-1">
+            @yield('content')
+        </div>
+
     </main>
     
     @include('layouts.footer')

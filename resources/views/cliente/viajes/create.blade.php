@@ -114,6 +114,21 @@
                     </div>
                 </div>
             </div>
+
+            <div class="bg-white rounded-xl p-6 border border-[#EBECF0] ocean-shadow">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-blue-700 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                    <h2 class="font-headline-md">Selecciona tu transporte</h2>
+                </div>
+
+                <div id="transportes-container">
+                    <p class="text-slate-400 text-center py-8">Primero selecciona un destino</p>
+                </div>
+
+                @error('transporte_id')
+                    <p class="text-error text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
         
         <!-- Sidebar - Resumen -->
@@ -177,6 +192,7 @@
 <script>
     // Datos de hospedajes por destino
     const hospedajesPorDestino = @json($hospedajesPorDestino ?? []);
+    const transportesContainer = document.getElementById('transportes-container');
     
     // Referencias a elementos
     const destinoSelect = document.getElementById('destino_id');
@@ -202,55 +218,106 @@
     fechaFin.addEventListener('change', actualizarResumen);
     cantidadPersonas.addEventListener('input', actualizarResumen);
     
-    // Cargar hospedajes al seleccionar destino
+    // Cargar hospedajes y transportes al seleccionar destino
     destinoSelect.addEventListener('change', async () => {
         const destinoId = destinoSelect.value;
+
         if (!destinoId) {
             hospedajesContainer.innerHTML = '<p class="text-slate-400 text-center py-8">Selecciona un destino primero</p>';
             document.getElementById('destino-preview').classList.add('hidden');
+            transportesContainer.innerHTML = '<p class="text-slate-400 text-center py-8">Selecciona un destino primero</p>';
             actualizarResumen();
             return;
         }
-        
-        // Mostrar preview del destino
+
+        // Preview destino
         const destinoNombre = destinoSelect.options[destinoSelect.selectedIndex]?.text;
         document.getElementById('destino-nombre').innerText = destinoNombre;
         document.getElementById('destino-preview').classList.remove('hidden');
-        
-        // Cargar hospedajes
+
         try {
-            const response = await fetch(`/api/hospedajes?destino_id=${destinoId}`);
-            const hospedajes = await response.json();
-            
-            if (hospedajes.length === 0) {
-                hospedajesContainer.innerHTML = '<div class="text-center py-8"><span class="material-symbols-outlined text-4xl text-slate-300">hotel</span><p class="text-slate-400 mt-2">No hay hospedajes disponibles para este destino</p></div>';
-                return;
+            // HOSPEDAJES
+            const hospedajesResponse = await fetch(`/api/hospedajes?destino_id=${destinoId}`);
+
+            if (!hospedajesResponse.ok) {
+                throw new Error('Error al cargar hospedajes');
             }
-            
-            hospedajesContainer.innerHTML = `
-                <div class="grid grid-cols-1 gap-3">
-                    ${hospedajes.map(h => `
-                        <label class="flex items-start gap-3 p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors ${old('hospedaje_id') == h.id ? 'border-primary bg-blue-700/5' : 'border-[#DFE1E6]'}">
-                            <input type="radio" name="hospedaje_id" value="${h.id}" class="mt-1" ${old('hospedaje_id') == h.id ? 'checked' : ''} onchange="actualizarResumen()">
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="font-semibold">${h.nombre}</p>
-                                        <p class="text-sm text-slate-500">${h.tipo}</p>
-                                        <p class="text-xs text-slate-400 mt-1">Capacidad: ${h.capacidad} personas</p>
+
+            const hospedajes = await hospedajesResponse.json();
+
+            if (!hospedajes.length) {
+                hospedajesContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <span class="material-symbols-outlined text-4xl text-slate-300">hotel</span>
+                        <p class="text-slate-400 mt-2">No hay hospedajes disponibles</p>
+                    </div>
+                `;
+            } else {
+                hospedajesContainer.innerHTML = `
+                    <div class="grid grid-cols-1 gap-3">
+                        ${hospedajes.map(h => `
+                            <label class="flex items-start gap-3 p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                                <input type="radio" name="hospedaje_id" value="${h.id}" class="mt-1" onchange="actualizarResumen()">
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-semibold">${h.nombre}</p>
+                                            <p class="text-sm text-slate-500">${h.tipo}</p>
+                                            <p class="text-xs text-slate-400 mt-1">Capacidad: ${h.capacidad} personas</p>
+                                        </div>
+                                        <p class="font-bold text-primary">$${h.precio_base || 100}/noche</p>
                                     </div>
-                                    <p class="font-bold text-primary">$${h.precio_base || 100}/noche</p>
+                                    <p class="text-sm text-slate-500 mt-2">📍 ${h.direccion}</p>
                                 </div>
-                                <p class="text-sm text-slate-500 mt-2">📍 ${h.direccion}</p>
-                            </div>
-                        </label>
-                    `).join('')}
-                </div>
-            `;
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // TRANSPORTES
+            const transportesResponse = await fetch(`/api/transportes`);
+            if (!transportesResponse.ok) {
+                throw new Error('Error al cargar transportes');
+            }
+
+            const response = await transportesResponse.json();
+            const transportes = response.data;
+
+            if (!transportes.length) {
+                transportesContainer.innerHTML = `
+                    <p class="text-slate-400 text-center py-8">No hay transportes disponibles</p>
+                `;
+            } else {
+                transportesContainer.innerHTML = `
+                    <div class="grid grid-cols-1 gap-3">
+                        ${transportes.map(t => `
+                            <label class="flex items-start gap-3 p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                                <input type="radio" name="transporte_id" value="${t.id}" class="mt-1" onchange="actualizarResumen()">
+                                <div class="flex-1">
+                                    <p class="font-semibold">${t.tipo}</p>
+                                    <p class="text-sm text-slate-500">Modelo: ${t.modelo ?? 'N/A'}</p>
+                                    <p class="text-xs text-slate-400">Capacidad: ${t.capacidad}</p>
+                                    <p class="text-xs text-slate-400">Placa: ${t.placa}</p>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
             actualizarResumen();
+
         } catch (error) {
-            console.error('Error:', error);
-            hospedajesContainer.innerHTML = '<p class="text-error text-center py-8">Error al cargar hospedajes</p>';
+            console.error('Error cargando datos:', error);
+
+            hospedajesContainer.innerHTML = `
+                <p class="text-error text-center py-8">Error al cargar hospedajes</p>
+            `;
+
+            transportesContainer.innerHTML = `
+                <p class="text-error text-center py-8">Error al cargar transportes</p>
+            `;
         }
     });
     

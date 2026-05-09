@@ -1,14 +1,14 @@
 <x-mail::message>
-# Introduction
+# Introducción
 
-Gracias {{ $user }} por hacer la reservacion con nosotros.
-A continuacion se desgloza más informacion:
+Gracias {{ $user->name }} por hacer la reservación con nosotros.
 
+A continuación se desglosa podras visualizar tu itinerario del viaje. Para cualquier duda no dudes en enviar un correo electrónico.
 
 <x-mail::button :url="''">
-Button Text
+Ver detalles
 </x-mail::button>
 
-Thanks,<br>
+Gracias,<br>
 {{ config('app.name') }}
 </x-mail::message>

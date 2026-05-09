@@ -89,4 +89,10 @@ class DestinoController extends Controller
         $destinos = Destino::all();
         return response()->json($destinos);
     }
+
+    public function publicIndex()
+    {
+        $destinos = Destino::paginate(9);
+        return view('destinos.publicos', compact('destinos'));
+    }
 }

@@ -37,12 +37,6 @@
             </button>
             <a href="/" class="text-2xl font-black text-[#0052CC] font-['Plus_Jakarta_Sans'] tracking-tight">GlobalQuest</a>
         </div>
-        <div class="hidden md:flex items-center gap-8">
-            <a class="text-[#0052CC] border-b-2 border-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight" href="/">Inicio</a>
-            <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="#destinos">Destinos</a>
-            <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="#paquetes">Paquetes</a>
-            <a class="text-slate-600 hover:text-[#0052CC] font-['Plus_Jakarta_Sans'] font-semibold tracking-tight transition-colors" href="#nosotros">Nosotros</a>
-        </div>
         <div class="flex items-center gap-4">
             @auth
                 <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-primary text-white rounded-lg ocean-shadow hover:bg-on-primary-fixed-variant transition-colors">
@@ -50,7 +44,7 @@
                 </a>
             @else
                 <a href="{{ route('login') }}" class="px-4 py-2 text-primary font-semibold hover:bg-primary/10 rounded-lg transition-colors">Iniciar Sesión</a>
-                <a href="{{ route('register') }}" class="px-5 py-2 bg-primary text-white font-semibold rounded-lg ocean-shadow hover:bg-on-primary-fixed-variant transition-colors">Registrarse</a>
+                <a href="{{ route('register') }}" class="px-5 py-2 bg-blue-700 text-white font-semibold rounded-lg ocean-shadow hover:bg-on-primary-fixed-variant transition-colors">Registrarse</a>
             @endauth
         </div>
     </nav>
@@ -215,7 +209,7 @@
                         <div class="flex items-center gap-2 text-sm"><span class="material-symbols-outlined text-secondary">check_circle</span> Guías expertos</div>
                         <div class="flex items-center gap-2 text-sm"><span class="material-symbols-outlined text-secondary">check_circle</span> Equipo incluido</div>
                         <div class="flex items-center gap-2 text-sm"><span class="material-symbols-outlined text-secondary">check_circle</span> Alojamiento en campamentos</div>
-                        <button class="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-on-primary-fixed-variant transition-colors">Reservar Ahora</button>
+                        <button class="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-on-primary-fixed-variant transition-colors">Reservar Ahora</button>
                     </div>
                 </div>
                 

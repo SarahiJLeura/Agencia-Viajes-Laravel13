@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BienvenidaUsuario;
 
 class AuthController extends Controller
 {
@@ -65,7 +67,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'user',
         ]);
-
+        Mail::to($user->email)->send(new BienvenidaUsuario($user));
         Auth::login($user);
 
         return redirect('/dashboard');

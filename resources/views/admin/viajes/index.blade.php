@@ -9,6 +9,14 @@
                 <h1 class="font-headline-lg text-on-background">Gestión de Viajes</h1>
                 <p class="text-slate-500">Administra todas las reservas de viajes</p>
             </div>
+
+            {{-- BOTÓN AGREGAR --}}
+            <a href="{{ route('admin.viajes.create') }}"
+            class="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-5 py-3 rounded-xl font-semibold transition-all shadow-md">
+                
+                <span class="material-symbols-outlined text-sm">add</span>
+                Nuevo Viaje
+            </a>
         </div>
         
         @if(session('success'))
@@ -70,11 +78,33 @@
                                     {{ $estado }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <a href="{{ route('viajes.show', $viaje) }}" class="p-2 text-slate-400 hover:text-primary rounded-lg transition-colors inline-block">
+                            <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                {{-- VER --}}
+                                <a href="{{ route('admin.viajes.show', $viaje) }}"
+                                class="p-2 text-slate-400 hover:text-primary rounded-lg">
                                     <span class="material-symbols-outlined text-sm">visibility</span>
                                 </a>
-                             </td>
+
+                                {{-- EDITAR --}}
+                                <a href="{{ route('admin.viajes.edit', $viaje) }}"
+                                class="p-2 text-blue-500 hover:text-blue-700 rounded-lg">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </a>
+
+                                {{-- ELIMINAR --}}
+                                <form action="{{ route('admin.viajes.destroy', $viaje) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('¿Eliminar viaje?')">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="p-2 text-red-500 hover:text-red-700 rounded-lg">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                         @empty
                         <tr>

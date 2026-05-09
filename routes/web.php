@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
     
     // Admin
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        // destinos
+        Route::resource('/destinos', DestinoController::class);
         Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
         
         // Usuarios
@@ -44,14 +46,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/usuarios/importar', [UsuarioController::class, 'importarCSV'])->name('usuarios.importar');
         Route::get('/usuarios/exportar', [UsuarioController::class, 'exportarCSV'])->name('usuarios.exportar');
         
-        // Destinos
-        Route::resource('/destinos', DestinoController::class);
-        
         // Hospedajes
         Route::resource('/hospedajes', HospedajeController::class);
         
         // Viajes (Admin)
         Route::get('/viajes', [ViajeController::class, 'indexAdmin'])->name('viajes.index');
+        Route::get('/viajes/create', [ViajeController::class, 'createAdmin'])->name('viajes.create');
+        Route::post('/viajes', [ViajeController::class, 'storeAdmin'])->name('viajes.store');
+
+        Route::get('/viajes/{viaje}', [ViajeController::class, 'show'])->name('viajes.show');
+
+        Route::get('/viajes/{viaje}/edit', [ViajeController::class, 'edit'])->name('viajes.edit');
+        Route::put('/viajes/{viaje}', [ViajeController::class, 'update'])->name('viajes.update');
+
+        Route::delete('/viajes/{viaje}', [ViajeController::class, 'destroy'])->name('viajes.destroy');
+
     });
 });
 
@@ -59,3 +68,5 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('/transportes', TransporteController::class);
 });
+
+Route::get('/destinos', [DestinoController::class, 'publicIndex'])->name('destinos.publicos');

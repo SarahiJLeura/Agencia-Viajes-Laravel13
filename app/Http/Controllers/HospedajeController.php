@@ -96,9 +96,29 @@ class HospedajeController extends Controller
             ->with('success', 'Hospedaje eliminado exitosamente');
     }
 
-    public function apiHospedajes()
+    public function apiHospedajes(Request $request)
     {
-        $hospedajes = Hospedaje::with('destinos')->get();
+        $query = Hospedaje::with('destinos');
+        if ($request->destino_id) {
+            $query->whereHas('destinos', function ($q) use ($request) {
+                $q->where('destinos.id', $request->destino_id);
+            });
+        }
+        return response()->json($query->get());
+    }
+
+    public function apiByDestino(Request $request)
+    {
+        $destinoId = $request->get('destino_id');
+        
+        if ($destinoId) {
+            $hospedajes = Hospedaje::whereHas('destinos', function($query) use ($destinoId) {
+                $query->where('destinos.id', $destinoId);
+            })->get();
+        } else {
+            $hospedajes = Hospedaje::all();
+        }
+        
         return response()->json($hospedajes);
     }
 }

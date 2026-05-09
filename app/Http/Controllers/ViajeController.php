@@ -8,6 +8,7 @@ use App\Models\DetallesViaje;
 use App\Models\Transporte;
 use App\Models\Hospedaje;
 use App\Models\Viaje;
+use App\Models\User;
 use App\Services\TransporteApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,8 +46,19 @@ class ViajeController extends Controller
         $viajes = Viaje::with(['user', 'destino', 'hospedaje'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-        
-        return view('admin.viajes.index', compact('viajes'));
+
+        $usuarios = User::all();
+        $destinos = Destino::all();
+        $hospedajes = Hospedaje::all();
+        $transportes = Transporte::all();
+
+        return view('admin.viajes.index', compact(
+            'viajes',
+            'usuarios',
+            'destinos',
+            'hospedajes',
+            'transportes'
+        ));
     }
 
     public function store(Request $request)
@@ -112,7 +124,8 @@ class ViajeController extends Controller
         // Enviar correo con PDF
         try {
             $pdf = $this->generarPDF($viaje);
-            Mail::to(Auth::user()->email)->send(new ConfirmacionViaje($viaje, $pdf));
+            $pdfOutput = $pdf->output();
+            Mail::to($viaje->user->email)->send(new ConfirmacionViaje($viaje, $pdfOutput));
             
             return redirect()->route('viajes.show', $viaje)
                 ->with('success', '¡Viaje confirmado! Se ha enviado un correo con los detalles y PDF adjunto.');
@@ -138,7 +151,7 @@ class ViajeController extends Controller
     {
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.viaje', [
             'viaje' => $viaje,
-            'user' => Auth::user(),
+            'user' => $viaje->user,
             'fecha' => now(),
         ]);
         
@@ -155,5 +168,136 @@ class ViajeController extends Controller
         
         $pdf = $this->generarPDF($viaje);
         return $pdf->download('viaje_' . $viaje->id . '.pdf');
+    }
+
+    public function edit(Viaje $viaje)
+    {
+        $destinos = Destino::all();
+        $hospedajes = Hospedaje::all();
+        $transportes = Transporte::all();
+
+        return view('admin.viajes.edit', compact(
+            'viaje',
+            'destinos',
+            'hospedajes',
+            'transportes'
+        ));
+    }
+
+    public function update(Request $request, Viaje $viaje)
+    {
+        $request->validate([
+            'destino_id' => 'required',
+            'hospedaje_id' => 'required',
+            'transporte_id' => 'required',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date',
+            'cantidad_personas' => 'required|integer|min:1',
+        ]);
+
+        $viaje->update($request->all());
+
+        return redirect()
+            ->route('admin.viajes.index')
+            ->with('success', 'Viaje actualizado correctamente');
+    }
+
+    public function destroy(Viaje $viaje)
+    {
+        $viaje->delete();
+
+        return redirect()
+            ->route('admin.viajes.index')
+            ->with('success', 'Viaje eliminado correctamente');
+    }
+
+    public function createAdmin()
+    {
+        $destinos = Destino::all();
+        $transportes = Transporte::all();
+        $usuarios = User::all();
+
+        return view('admin.viajes.create', compact(
+            'usuarios',
+            'destinos',
+            'transportes'
+        ));
+    }
+
+    public function storeAdmin(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'destino_id' => 'required|exists:destinos,id',
+            'hospedaje_id' => 'required|exists:hospedajes,id',
+            'transporte_id' => 'nullable|exists:transportes,id',
+            'fecha_inicio' => 'required|date|after:today',
+            'fecha_fin' => 'required|date|after:fecha_inicio',
+            'cantidad_personas' => 'required|integer|min:1',
+            'tipo_viaje' => 'required|string',
+        ]);
+
+        $destino = Destino::find($request->destino_id);
+        $hospedaje = Hospedaje::find($request->hospedaje_id);
+
+        $dias = now()->parse($request->fecha_inicio)->diffInDays($request->fecha_fin);
+        $precioHospedaje = 100 * $dias * $request->cantidad_personas;
+
+        $precioTransporte = 0;
+        $transporteData = null;
+
+        if ($request->transporte_id) {
+            $transporte = Transporte::find($request->transporte_id);
+            if ($transporte) {
+                $precioTransporte = $transporte->tarifa_base > 0 ? $transporte->tarifa_base : 200;
+                $transporteData = $transporte;
+            }
+        }
+
+        $precioTotal = $precioHospedaje + $precioTransporte;
+
+        $viaje = Viaje::create([
+            'user_id' => $request->user_id,
+            'destino_id' => $request->destino_id,
+            'hospedaje_id' => $request->hospedaje_id,
+            'transporte_id' => $request->transporte_id,
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_fin' => $request->fecha_fin,
+            'cantidad_personas' => $request->cantidad_personas,
+            'tipo_viaje' => $request->tipo_viaje,
+            'precio_total' => $precioTotal,
+        ]);
+
+        // Detalles
+        DetallesViaje::create([
+            'viaje_id' => $viaje->id,
+            'concepto' => 'Hospedaje: ' . $hospedaje->nombre,
+            'costo' => $precioHospedaje,
+        ]);
+
+        if ($transporteData) {
+            DetallesViaje::create([
+                'viaje_id' => $viaje->id,
+                'concepto' => 'Transporte: ' . $transporteData->tipo . ' - ' . $transporteData->placa,
+                'costo' => $precioTransporte,
+            ]);
+        }
+
+        try {
+            $pdf = $this->generarPDF($viaje);
+            $pdfOutput = $pdf->output();
+
+            Mail::to($viaje->user->email)->send(
+                new ConfirmacionViaje($viaje, $pdfOutput)
+            );
+
+            return redirect()
+                ->route('admin.viajes.index')
+                ->with('success', 'Viaje creado y correo enviado con PDF.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Viaje creado pero falló el correo: ' . $e->getMessage());
+        }
     }
 }
